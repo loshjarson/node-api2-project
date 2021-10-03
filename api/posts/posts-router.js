@@ -49,7 +49,7 @@ router.post('/', (req,res) => {
     }
 })
 
-server.put("/api/users/:id",async (req,res) => {
+router.put('/:id',async (req,res) => {
     const {id} = req.params
     const changes = req.body
     try{
@@ -69,5 +69,17 @@ server.put("/api/users/:id",async (req,res) => {
     }
 })
 
+router.delete('/:id', async (req, res)=>{
+    try{
+        const {id} = req.params
+        const deletedPost = await Post.remove(id)
+        if(!deletedPost){
+            res.status(404).json({ message: "The post with the specified ID does not exist" })
+        }else{
+            res.status(201).json(deletedPost)
+        }
+    }catch(err){
+        res.status(500).json({ message: "The post could not be removed" })
+    }})
 
   module.exports = router
