@@ -50,3 +50,54 @@ router.post('/', (req,res) => {
         })
     }
 })  
+
+router.put('/:id',(req,res) => {
+    const {id} = req.params;
+    const changes = req.body;
+    if(!changes.title || !changes.contents){
+        res.status(400).json({ message: "Please provide title and contents for the post" })
+    }else{
+        Post.update(id,changes)
+        .then( post => {
+            if(!post){
+            res.status(404).json({ message: "The post with the specified ID does not exist" })
+            }else{
+                Post.findById(id)
+                .then(post => {
+                res.status(201).json(post)
+            })
+            .catch(err => {
+                res.status(500).json({ message: "There was an error while saving the post to the database" })
+            }) 
+            }
+        }
+        ).catch(err=> {
+                res.status(500).json({ message: "The post information could not be modified" })
+            })
+    } 
+
+
+})
+
+router.delete('/:id', (req, res)=>{
+    const {id} = req.params
+    Post.findById(id)
+        .then(post => {
+            if (post) {
+                Post.remove(id)
+                    .then(posts => {
+                        res.status(200).json(post)
+                    })
+                    .catch(err =>{
+                        res.status(404).json({ message: "The post with the specified ID does not exist" })})
+            
+            } else {
+                res.status(404).json({ message: "The post with the specified ID does not exist" })
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({ message: "The post information could not be retrieved" });
+          });
+})
+
